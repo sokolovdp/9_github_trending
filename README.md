@@ -1,24 +1,22 @@
 # Github Trends
 
-usage:
-------
+parameters:
+-----------
 ```
-python github_trending.py [--help] --n N   --date DATE
+python github_trending.py [--help] [--n N]  --date DATE
 
-this program prints N top GitHub repositories from the given date
+this program prints N top GitHub repositories from the given DATE
 
 arguments:
   --help       show this help message and exit
-  --n N        number of repositories
+  --n N        number of repositories, default=20
   --date DATE  date, in the format: YYYY-MM-DD
 ```
-usage:
-------
+usage sample:
+-------------
 ```
-python github_trending.py  --n=20  --date=2017-06-04
+python github_trending.py  --n=5  --date=2017-06-04
 ```
-sample:
--------
 ```
 https://github.com/alexpate/awesome-design-systems 💅🏻 ⚒ A collection of awesome design systems, open issues: 5
 https://github.com/vulnersCom/getsploit Command line utility for searching and downloading exploits, open issues: 0
