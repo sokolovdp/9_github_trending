@@ -3,17 +3,29 @@ import sys
 import argparse
 
 
-def get_response(url: "str", parameters: "dict"):
+class Response:
+    def __init__(self, data, err):
+        self.data = data
+        self.err = err
+        self.ok = err is None
+
+
+def get_response(url: "str", parameters: "dict") -> "Response":
     response = requests.get(url, parameters)
     if response.ok:
-        return response.json()['items']
+        return Response(response.json()['items'], None)
     else:
-        print("github api error: ", response)
+        return Response(None, "api error")
 
 
 def get_trending_repositories(number_of_repos: "int", from_date: "str"):
     parameters = {'q': 'created:>{}'.format(from_date), 'sort': 'stars', 'order': 'desc'}
-    return get_response('https://api.github.com/search/repositories', parameters)[:number_of_repos]
+    response = get_response('https://api.github.com/search/repositories', parameters)
+    if response.ok:
+        return response.data[:number_of_repos]
+    else:
+        print("can't load data from github, reason {}".format(response.err))
+        exit()
 
 
 def main(number_of_repos: "int", from_date: "str"):
