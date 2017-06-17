@@ -3,34 +3,33 @@ import sys
 import argparse
 
 
-class Response:
-    def __init__(self, data, err):
-        self.data = data
-        self.err = err
-        self.ok = err is None
+def make_response(data: "list", error: "str") -> "dict":
+    return {'data': data, 'err': error, 'ok': error is None}
 
 
-def get_response(url: "str", parameters: "dict") -> "Response":
+def get_response(url: "str", parameters: "dict") -> "make_response":
     response = requests.get(url, parameters)
     if response.ok:
-        return Response(response.json()['items'], None)
+        return make_response(response.json()['items'], None)
     else:
-        return Response(None, "api error")
+        return make_response(None, "api error")
 
 
 def get_trending_repositories(number_of_repos: "int", from_date: "str"):
-    parameters = {'q': 'created:>{}'.format(from_date), 'sort': 'stars', 'order': 'desc'}
-    response = get_response('https://api.github.com/search/repositories', parameters)
-    if response.ok:
-        return response.data[:number_of_repos]
-    else:
-        print("can't load data from github, reason {}".format(response.err))
-        exit()
+    parameters = {'q': 'created:>{}'.format(from_date), 'sort': 'stars', 'order': 'desc', 'per_page': number_of_repos}
+    github_response = get_response('https://api.github.com/search/repositories', parameters)
+    if github_response['ok']:
+        return github_response['data']
 
 
 def main(number_of_repos: "int", from_date: "str"):
-    for repo in get_trending_repositories(number_of_repos, from_date):
-        print("{} {}, open issues: {}".format(repo['html_url'], repo['description'].strip(), repo['open_issues_count']))
+    trending_repos = get_trending_repositories(number_of_repos, from_date)
+    if trending_repos is not None:
+        for repo in trending_repos:
+            print("{} {}, open issues: {}".format(repo['html_url'], repo['description'].strip(),
+                                                  repo['open_issues_count']))
+    else:
+        print("github api response error")
 
 
 if __name__ == '__main__':
